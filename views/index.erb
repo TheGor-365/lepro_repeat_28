@@ -1,0 +1,18 @@
+<div class="container mt-5">
+	<div class="row">
+		<h2>Lastest posts:</h2>
+	</div>
+</div>
+
+<%= @posts_as_array %>
+
+<div class="container mt-5">
+	<div class="col p-0">
+		<% @posts_as_array.each do |post| %>
+			<% post.each do |message| %>
+				<p><small><%= message %></small></p>
+			<% end %>
+			<hr>
+		<% end %>
+	</div>
+</div>
