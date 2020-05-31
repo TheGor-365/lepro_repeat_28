@@ -1,0 +1,20 @@
+<div class="container mt-5">
+	<div class="row">
+		<h2>Post details</h2>
+	</div>
+</div>
+
+<div class="container mt-5">
+	<div class="col">
+		<small class="text-muted">Post id:</small><%= @row[0] %><br>
+	</div>
+		
+	<div class="col">
+		<small class="text-muted">Post body:</small><%= @row[1] %><br>
+	</div>
+		
+	<div class="col">
+		<small class="text-muted">Post creating date:</small><%= @row[2] %><br>
+	</div>
+	<a href="/details/<%= $. %>"><small class="text-decoration-none">Comments</small></a>
+</div>

@@ -12,6 +12,7 @@
 			<% post.each do |message| %>
 				<p><small><%= message %></small></p>
 			<% end %>
+			<a href="/details/<%= $. %>"><small class="text-decoration-none">Comments</small></a>
 			<hr>
 		<% end %>
 	</div>

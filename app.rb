@@ -66,7 +66,7 @@ before do
   @posts_as_array = @arr
 
   @arr.each do |item|
-    @hh[item[1]] = item[2]
+    @hh[item[0]] = item[1]
   end
 
   @posts_as_hash = @hh
@@ -108,3 +108,11 @@ post '/new' do
   redirect to '/' 
 end
 
+get '/details/:post_id' do
+  post_id = params[:post_id]
+
+  # @results = @db.execute 'SELECT * FROM Posts WHERE id = ?', [post_id]
+  @row = @posts_as_array[0]
+
+  erb :details
+end
