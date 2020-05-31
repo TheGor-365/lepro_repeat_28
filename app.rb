@@ -56,6 +56,7 @@ end
 before do
   @f = File.open 'public/posts/posts.txt', 'r+'
   @arr = []
+  @arr2 = []
   @hh = {}
 
   @f.each_line do |line|
@@ -65,9 +66,16 @@ before do
 
   @posts_as_array = @arr
 
-  @arr.each do |item|
-    @hh[item[0]] = item[1]
+  @arr.each_with_index do |sm_arr, i|
+    @hh[:id] = [sm_arr[0]]
+    @hh[:post_body] = sm_arr[1]
+    @hh[:created_date] = sm_arr[2]
+    # sm_arr.each do |post_item|
+    #   @arr2 << @hh
+    # end
+    @arr2 << @hh
   end
+  
 
   @posts_as_hash = @hh
 end
