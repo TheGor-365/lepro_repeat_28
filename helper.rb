@@ -1,9 +1,6 @@
-# def arraer arr
-# 	f.split(/__/)
-# 	return f
-# end
+@columns = ['id', 'body', 'date']
 
-arr = [
+@data = [
 
 	["1", "aaa", "30/05/2020 20:08\n"], 
 	["2", "fff", "30/05/2020 20:08\n"], 
@@ -13,21 +10,16 @@ arr = [
 	["6", "One more, just for checking how it works, and look if we have some bugs...", "30/05/2020 23:09\n"]
 ]
 
-hh = {}
-
-
-arr.each_with_index do |sm_arr, i|
-	@arr2 = []
-
-	hh[:id] = sm_arr[0]
-	hh[:body] = sm_arr[1]
-	hh[:date] = sm_arr[2]
-	@arr2 << hh
-
+def self.hash_maker columns, data
+	data.collect { |small_arr| { 
+		@columns[0] => small_arr[0].strip, 
+		@columns[1] => small_arr[1].strip, 
+		@columns[2] => small_arr[2].strip 
+	} }
 end
 
-puts arr.inspect
+@result_posts = hash_maker @columns, @data 
+
+puts @result_posts.inspect
 puts
-puts hh.inspect		
-puts
-puts @arr2.inspect
+puts @result_posts

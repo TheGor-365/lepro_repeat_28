@@ -12,7 +12,7 @@
 			<small class="text-muted">Post id:</small>  
 		</div>
 		<div class="col-9">
-			<%= @row[0] %>
+			<%= @sm_array['id'] %>
 		</div>
 	</div>
 
@@ -21,7 +21,7 @@
 			<small class="text-muted">Post body:</small> 
 		</div>
 		<div class="col-9">
-			<%= @row[1] %>
+			<%= @sm_array['post_body'] %>
 		</div>
 	</div>	
 
@@ -30,32 +30,33 @@
 			<small class="text-muted">Post creating date:</small> 
 		</div>
 		<div class="col-9">
-			<%= @row[2] %>
+			<%= @sm_array['created_date'] %>
 		</div> 
 	</div>
 </div>
 <hr>
 
-<% @c_as_hash.each do |comment| %>
-	<p>
-		<%= comment %>
-	</p>
-<% end %>
+
 				
-	<div class="container mt-5">
-		<div class="row">
-			<div class="col-6 pl-0">
-				<form action="/details/<%= @row[0] %>" method="POST">
-					<div class="form-group">
-					 	<label class="text-decoration-none" for="comment">Comments:</label>
-					 	<textarea name="comment" class="form-control" id="comment" rows="6" placeholder="Add your comments here" autofocus></textarea>
-					</div>
+<div class="container mt-5">
+	<div class="row">
+		<div class="col-6 pl-0">
+			<form action="/details/<%= @sm_array['id'] %>" method="POST">
+				<div class="form-group">
+				 	<label class="text-decoration-none" for="comment">Comments:</label>
+				 	<br>
+				 	<% @comments.each do |comment| %>
+				 		<small><%= comment['comment'] %></small><br>
+				 		<small class="text-muted"><%= comment['comment_date'] %></small><br>
+				 		<hr>
+				 	<% end %>
+				 	<textarea name="comment" class="form-control" id="comment" rows="6" placeholder="Add your comments here" autofocus></textarea>
+				</div>
 
-					<button type="submit" class="btn btn-primary btn-lg">Send</button>
-				</form>
-			</div>
-
+				<button type="submit" class="btn btn-primary btn-lg">Send</button>
+			</form>
 		</div>
 	</div>
+</div>
 					
 

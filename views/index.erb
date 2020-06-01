@@ -1,29 +1,39 @@
-<div class="container mt-5">
+<div class="container mt-5 mb-5">
 	<div class="row">
-		<h2>Lastest posts:</h2>
+		<h2>Lastest posts</h2>
 	</div>
 </div>
-<div class="col m-2">
-	<%= @posts_as_array %>
-</div>
 
-<div class="col m-2">
-	<%= @posts_as_hash %>
-</div>
+<div class="row">
+	<div class="col-3">
+		<div id="list-example" class="list-group position-fixed">
+			<% @result_posts.each do |post| %>
+				<a class="list-group-item list-group-item-action" href="#<%= post['id'] %>">
+					<small class="text-muted">Post id: <%= post['id'] %></small>
+				</a>
+			<% end %>				
+		</div>
+	</div>
 
-<div class="col m-2">
-	<%= @arr2 %>
-</div>
-
-
-<div class="container mt-5">
-	<div class="col p-0">
-		<% @posts_as_array.each do |post| %>
-			<% post.each do |message| %>
-				<p><small><%= message %></small></p>
-			<% end %>
-			<a href="/details/<%= $. %>"><small class="text-decoration-none">Comments</small></a>
-			<hr>
-		<% end %>
+	<div class="col-9">
+		<div data-spy="scroll" data-target="#list-example" data-offset="0" class="scrollspy-example">
+			<% @result_posts.each do |post| %>
+				<h5 id="<%= post['id'] %>"><%= post['id'] %></h5>		
+				<p class="mb-5 mt-5"><%= post['post_body'] %></p>
+				<small class="text-muted mr-3">Added at: <%= post['created_date'] %></small>
+				<a class="text-decoration-none" href="/details/<%= post['id'] %>"><small>comments</small></a>
+				<hr>	
+			<% end %>					    
+		</div>
 	</div>
 </div>
+
+
+
+
+
+  
+
+
+
+

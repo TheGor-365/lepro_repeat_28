@@ -8,9 +8,57 @@ require 'sinatra/reloader'
 #   @db.results_as_hash = true
 # end
 
+# method for posts.txt data
+
+def posts_hash_maker columns, data
+  data.collect { |row| { 
+    columns[0] => row[0].strip, 
+    columns[1] => row[1].strip, 
+    columns[2] => row[2].strip 
+  } }
+end
+
 # before do
 #   init_db
 # end
+
+# before /index (main)
+
+before do
+  posts_txt = File.open 'public/data/posts.txt', 'r'
+
+  @posts_columns = ['id', 'post_body', 'created_date']
+  @posts_data = []
+
+  posts_txt.each_line do |line|
+    post = line.split(/\__/)
+    @posts_data << post
+  end
+
+  @posts_data.reverse!
+
+  @result_posts = posts_hash_maker @posts_columns, @posts_data
+
+  posts_txt.close 
+end
+
+# before /details/:post_id
+
+before do
+  comments_txt = File.open 'public/data/comments.txt', 'a+'
+
+  @comments_columns = ['post_id', 'comment', 'comment_date']
+  @comments_data = []
+
+  comments_txt.each_line do |line|
+    comment = line.split(/\__/)
+    @comments_data << comment
+  end
+
+  @result_comments = posts_hash_maker @comments_columns, @comments_data
+
+  comments_txt.close
+end
 
 # configure do
 #   init_db
@@ -27,6 +75,8 @@ require 'sinatra/reloader'
 #     post_id INTEGER
 #   )'
 # end
+
+# sign in/sign out handlers
 
 configure do
   enable :sessions
@@ -60,39 +110,15 @@ get '/secure/place' do
   erb :cab
 end
 
-before do
-  @f = File.open 'public/posts/posts.txt', 'r+'
-
-  @arr = []
-  @arr2 = []
-  @hh = {}
-
-  @f.each_line do |line|
-    value = line.split(/\__/)
-    @arr << value
-  end
-
-  @posts_as_array = @arr
-
-  @arr.each_with_index do |sm_arr, i|
-    @hh[:id] = [sm_arr[0]]
-    @hh[:post_body] = sm_arr[1]
-    @hh[:created_date] = sm_arr[2]
-
-    @arr2 << @hh
-  end
-  
-  @posts_as_hash = @hh
-end
+# git index/ (main)
 
 get '/' do
-  # @results = @db.execute 'SELECT * FROM Posts ORDER BY id DESC'
+  @result_posts
+
+  # @results = @db.execute 'SELECT * FROM Posts 
+  # ORDER BY id DESC'
   
   erb :index
-end
-
-get '/new' do
-  erb :new
 end
 
 post '/login/attempt' do
@@ -100,6 +126,17 @@ post '/login/attempt' do
   where_user_came_from = session[:previous_url] || '/'
   redirect to where_user_came_from
 end
+
+# get /new
+#---------
+
+get '/new' do
+  
+  erb :new
+end
+
+# post /new
+#----------
 
 post '/new' do
   content = params[:content]
@@ -112,58 +149,48 @@ post '/new' do
   d = DateTime.now
   d.strftime("%d.%m.%Y %H:%M")
 
-  @f = File.open 'public/posts/posts.txt', 'a+' 
-  @f.write "#{$.}__#{content}__#{d.strftime("%d/%m/%Y %H:%M")}\n"
-  @f.close
+  posts_txt = File.open 'public/data/posts.txt', 'a+' 
+  posts_txt.write "#{$.}__#{content}__#{d.strftime("%d/%m/%Y %H:%M")}\n"
+  posts_txt.close
 
-  # @db.execute 'INSERT INTO Posts (content, created_date) VALUES (?, datetime())', [content]
+  # @db.execute 'INSERT INTO Posts (content, created_date) 
+  #   VALUES (?, datetime())', [content]
+
   redirect to '/' 
 end
+
+# get /details/:post_id
+#----------------------
 
 get '/details/:post_id' do
   post_id = params[:post_id]
 
-  # @results = @db.execute 'SELECT * FROM Posts WHERE id = ?', [post_id]
+  # results = @db.execute 'SELECT * FROM Posts 
+  #   WHERE id = ?', [post_id]
+
   # @row = results[0]
 
-  @row = @posts_as_array[0]
+  results = @result_posts.select {|post_hash| post_hash['id'] == post_id}
+  @sm_array = results[0]
 
-  # @comments = @db.execute 'SELECT * FROM Comments WHERE post_id = ? ORDER BY id', [post_id]
+  # @comments = @db.execute 'SELECT * FROM Comments 
+  #   WHERE post_id = ? 
+  #   ORDER BY id', [post_id]
+
+  @comments = @result_comments.select {|comment_hash| comment_hash['post_id'] == post_id}
+  @comments.reverse!
 
   erb :details
 end
 
-before '/details/:post_id' do
-  @f2 = File.open 'public/posts/comments.txt', 'a+'
-
-  @arr_c = []
-  @arr2_c = []
-  @hh_c = {}
-
-  @f2.each_line do |line|
-    value = line.split(/\__/)
-    @arr_c << value
-  end
-
-  @c_as_array = @arr
-
-  @arr.each_with_index do |sm_arr, i|
-    @hh_c[:id] = [sm_arr[0]]
-    @hh_c[:post_body] = sm_arr[1]
-    @hh_c[:created_date] = sm_arr[2]
-
-    @arr2_c << @hh_c
-  end
-
-  @c_as_hash = @hh_c
-end
+# post /details/:post_id
+#-----------------------
 
 post '/details/:post_id' do
-  comment = params[:comment]
   post_id = params[:post_id]
-
-  content = params[:content]
-
+  comment = params[:comment]
+  
+  
   if comment.length <= 0
     @error = 'Input comment text'
     return erb :details
@@ -172,11 +199,12 @@ post '/details/:post_id' do
   d = DateTime.now
   d.strftime("%d.%m.%Y %H:%M")
 
-  @f2 = File.open 'public/posts/comments.txt', 'a+'
-  @f2.write "#{post_id}__#{comment}__#{d.strftime("%d/%m/%Y %H:%M")}\n"
-  @f2.close
+  comments_txt = File.open 'public/data/comments.txt', 'a+'
+  comments_txt.write "#{post_id}__#{comment}__#{d.strftime("%d/%m/%Y %H:%M")}\n"
+  comments_txt.close
 
-  # @db.execute 'INSERT INTO Comments (content, created_date, post_id) VALUES (?, datetime(), ?)', [content, post_id]
+  # @db.execute 'INSERT INTO Comments (content, created_date, post_id) 
+  #   VALUES (?, datetime(), ?)', [content, post_id]
 
   redirect to('/details/' + post_id)
 end
